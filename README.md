@@ -11,7 +11,7 @@ SdkManager还提供一套API来管理引用的SDK，方便在CI服务器上执�
 git clone https://github.com/xclouder/SdkManager.git
 ```
 ####2.导入SDK
-通过菜单[Window/SdkManager]打开SDK管理面板，点击右下角的"Install"按钮，选择SDK所在的文件夹。
+通过菜单`[Window/SdkManager]`打开SDK管理面板，点击右下角的"Install"按钮，选择SDK所在的文件夹。
 在已安装的SDK前面勾上/取消，即可启用/禁用此SDK。禁用的SDK在项目时会被忽略，启用的SDK目录在Assets/ManagedSDKs下可以看到。
 
 ###后续计划
