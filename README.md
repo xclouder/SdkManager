@@ -12,7 +12,7 @@ git clone https://github.com/xclouder/SdkManager.git
 ```
 ####2.导入SDK
 通过菜单`[Window/SdkManager]`打开SDK管理面板，点击右下角的"Install"按钮，选择SDK所在的文件夹。
-在已安装的SDK前面勾上/取消，即可启用/禁用此SDK。禁用的SDK在项目时会被忽略，启用的SDK目录在Assets/ManagedSDKs下可以看到。
+在已安装的SDK前面勾上/取消，即可启用/禁用此SDK。禁用的SDK在项目打包时会被忽略，启用的SDK目录在Assets/ManagedSDKs下可以看到。
 
 ###后续计划
 1.添加Hooks。切换SDK时，提供相关钩子进行一些自定义操作，如工程配置修改  
