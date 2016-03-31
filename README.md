@@ -15,7 +15,7 @@ git clone https://github.com/xclouder/SdkManager.git
 在已安装的SDK前面勾上/取消，即可启用/禁用此SDK。禁用的SDK在项目时会被忽略，启用的SDK目录在Assets/ManagedSDKs下可以看到。
 
 ###后续计划
-1.添加Hooks。切换SDK时，提供相关钩子进行一些自定义操作，如工程配置修改
+1.添加Hooks。切换SDK时，提供相关钩子进行一些自定义操作，如工程配置修改  
 2.支持SDK的Update  
 3.支持SDK套餐及其管理，几个SDK引用为一个套餐，切换一个目标平台时，只需切换一个套餐（请原谅我不知怎么想到了套餐这个词）  
 4.组件仓库，依赖管理  
