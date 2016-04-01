@@ -24,6 +24,21 @@ namespace xClouder.SdkManager{
 			ReloadSdkList();
 		}
 
+		[UnityEditor.Callbacks.DidReloadScripts]
+		private static void DidUnityReloadScripts()
+		{
+			var wins = Resources.FindObjectsOfTypeAll<SdkManagerEditorWindow>();
+			foreach (var w in wins)
+			{
+				w.Reload();
+			}
+		}
+
+		public void Reload()
+		{
+			ReloadSdkList();
+		}
+
 		private IList<SDKInfo> _sdkList;
 		private void ReloadSdkList()
 		{

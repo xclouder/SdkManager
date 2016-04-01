@@ -4,6 +4,9 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using xClouder.Utils;
+using xClouder.SdkManager.Callbacks;
+using System.Linq;
+using System.Reflection;
 
 namespace xClouder.SdkManager{
 	public class SdkManager {
@@ -127,7 +130,6 @@ namespace xClouder.SdkManager{
 
 			//copy from sourceDir to sdkStore
 			string destDir = Path.Combine(sdkStoreDir, sdkInfo.Name);
-			//		DirectoryCopy(sdkDirectory, destDir, true);
 			FileUtil.CopyFileOrDirectory(sdkDirectory, destDir);
 
 			return sdkInfo;
@@ -187,6 +189,25 @@ namespace xClouder.SdkManager{
 			}
 
 			AssetDatabase.Refresh();
+
+			NotifyEnabledSDK(sdk);
+		}
+
+		private void NotifyEnabledSDK(SDKInfo sdk)
+		{
+
+			var assemblies = System.AppDomain.CurrentDomain.GetAssemblies();
+
+			var methods = assemblies.SelectMany(s => s.GetTypes())
+				.SelectMany(t => t.GetMethods(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Static))
+				.Where(m => System.Attribute.IsDefined(m, typeof(OnModuleEnableAttribute)));
+
+			//todo, sort by attribute's order
+			foreach (var m in methods)
+			{
+				m.Invoke(null, new object[]{sdk});
+			}
+
 		}
 
 		public void DisableSDK(SDKInfo sdk)
@@ -211,6 +232,23 @@ namespace xClouder.SdkManager{
 			}
 
 			AssetDatabase.Refresh();
+
+			NotifyDisabledSDK(sdk);
+		}
+
+		private void NotifyDisabledSDK(SDKInfo sdk)
+		{
+			var assemblies = System.AppDomain.CurrentDomain.GetAssemblies();
+
+			var methods = assemblies.SelectMany(s => s.GetTypes())
+				.SelectMany(t => t.GetMethods(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Static))
+				.Where(m => System.Attribute.IsDefined(m, typeof(OnModuleDisableAttribute)));
+
+			//todo, sort by attribute's order
+			foreach (var m in methods)
+			{
+				m.Invoke(null, new object[]{sdk});
+			}
 		}
 
 		//get a copy of the list
