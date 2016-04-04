@@ -18,7 +18,7 @@ git clone https://github.com/xclouder/SdkManager.git
 ####3.事件处理(可选)
 启用/禁用一个SDK时，项目配置可能要相应做修改，如sdk相关appId需要设置等。SdkManager在Enable/Disable一个SDK时，会触发如下回调：
 ```
-  [OnModuleEnable]
+	[OnModuleEnable]
 	public static void OnModuleEnable(SDKInfo sdk)
 	{
 		Debug.Log("enable sdk:" + sdk.Name);
@@ -33,7 +33,18 @@ git clone https://github.com/xclouder/SdkManager.git
 开发者可在相应回调中修改配置信息
 
 ###CI集成
-略
+除了可视化修改SDK引用，还可以在CI构建脚本中直接调用
+```
+SdkManager.DisableAll(false);
+SdkManager.EnableSDK(sdkId1, false);
+SdkManager.EnableSDK(sdkId2, false);
+SdkManager.EnableSDK(sdkId3, false);
+...
+
+AssetDatabase.Refresh();
+
+```
+开发者可以通过配置描述当前Build需要引用的sdkIds，脚本中读取配置并将其Enable，就能实现CI构建时SDK自动化切换。
 
 ###后续计划
 1.支持SDK的Update  
