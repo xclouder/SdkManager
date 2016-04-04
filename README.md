@@ -35,7 +35,7 @@ git clone https://github.com/xclouder/SdkManager.git
 ###CI集成
 除了可视化修改SDK引用，还可以在CI构建脚本中直接调用
 ```
-SdkManager.DisableAll(false);
+SdkManager.DisableAllSDKs(false);
 SdkManager.EnableSDK(sdkId1, false);
 SdkManager.EnableSDK(sdkId2, false);
 SdkManager.EnableSDK(sdkId3, false);
