@@ -5,7 +5,7 @@ using System;
 namespace xClouder.SdkManager.Callbacks {
 	public class OnModuleEnableAttribute : Attribute {
 
-		public OnModuleEnableAttribute(int order) {
+		public OnModuleEnableAttribute(int order = 0) {
 			ExecuteOrder = order;
 		}
 
