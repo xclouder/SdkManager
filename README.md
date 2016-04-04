@@ -2,6 +2,9 @@
 这是一个Unity3d中用来方便管理第三方SDK导入的插件，可以可视化管理哪些SDK当前需要引入到工程。
 主要解决应用发布到不同平台时，需要切换不同SDK的烦恼。例如，应用的国内版和国国际版使用同一套代码，但分别需要接入微信、新浪微博，或者Facebook、twitter，SdkManager将这一切变得轻松。
 
+### 原理
+SdkManager将所有将用到的SDK文件拷贝到Assets/.SdkStore目录中，在Unity3d中视为不可见的。启用一个SDK时，在Assets/ManagedSDKs目录下建立软链接到.SdkStore相应SDK目录，并触发相应回调。
+
 ###如何使用
 ####1.导入插件  
 在Unity3d工程的Assets目录中运行
