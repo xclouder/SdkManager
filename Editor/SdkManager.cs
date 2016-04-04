@@ -155,7 +155,7 @@ namespace xClouder.SdkManager{
 			sdkInfoDict.Remove(sdk.Id);
 		}
 
-		public void EnableSDK(SDKInfo sdk)
+		public void EnableSDK(SDKInfo sdk, bool refreshAssetsImmediately = true)
 		{
 			if (!Directory.Exists(managedSDKsDir))
 			{
@@ -188,7 +188,8 @@ namespace xClouder.SdkManager{
 				Debug.LogWarning("link fail:" + srcPath + " -> " + link);
 			}
 
-			AssetDatabase.Refresh();
+			if (refreshAssetsImmediately)
+				AssetDatabase.Refresh();
 
 			NotifyEnabledSDK(sdk);
 		}
@@ -210,7 +211,7 @@ namespace xClouder.SdkManager{
 
 		}
 
-		public void DisableSDK(SDKInfo sdk)
+		public void DisableSDK(SDKInfo sdk, bool refreshAssetsImmediately = true)
 		{
 			if (!IsSdkExists(sdk)){
 				throw new System.InvalidOperationException("sdk not exist:" + sdk.Name);
@@ -231,7 +232,8 @@ namespace xClouder.SdkManager{
 				Debug.Log("no link file:" + link);
 			}
 
-			AssetDatabase.Refresh();
+			if (refreshAssetsImmediately)
+				AssetDatabase.Refresh();
 
 			NotifyDisabledSDK(sdk);
 		}
@@ -261,6 +263,82 @@ namespace xClouder.SdkManager{
 			list.AddRange(sdkInfos);
 			return list;
 		}
+
+		public List<SDKInfo> GetEnabledSDKs()
+		{
+			if (sdkInfos == null)
+				return null;
+
+			var list = new List<SDKInfo>();
+			foreach (var sdk in sdkInfos)
+			{
+				if (sdk.Enabled)
+				{
+					list.Add(sdk);
+				}
+			}
+			return list;
+		}
+
+		public void DisableAll(bool refreshAssetsAfterAllDisabled)
+		{
+			var list = GetEnabledSDKs();
+			if (list == null || list.Count == 0)
+			{
+				return;
+			}
+
+			foreach (var sdk in list)
+			{
+				try
+				{
+					DisableSDK(sdk, false);
+				}
+				catch(System.Exception e)
+				{
+					Debug.LogError("uninstall sdk error:" + e.ToString());
+					continue;
+				}
+			}
+
+			if (refreshAssetsAfterAllDisabled)
+				AssetDatabase.Refresh();
+		}
+
+		#region static Methods
+		public static void DisableAllSDKs(bool refreshAssetsAfterAllDisabled)
+		{
+			var mgr = SdkManager.Instance;
+			mgr.DisableAll(refreshAssetsAfterAllDisabled);
+		}
+
+		public static void EnableSDK(string sdkId, bool refreshImmediately)
+		{
+			var mgr = SdkManager.Instance;
+			var sdkInfo = mgr.GetSDKInfo(sdkId);
+			if (sdkInfo == null)
+			{
+				Debug.LogError("no SDK found for id:" + sdkId);
+				return;
+			}
+
+			mgr.EnableSDK(sdkInfo, refreshImmediately);
+		}
+
+		public static void DisableSDK(string sdkId, bool refreshImmediately)
+		{
+			var mgr = SdkManager.Instance;
+			var sdkInfo = mgr.GetSDKInfo(sdkId);
+			if (sdkInfo == null)
+			{
+				Debug.LogError("no SDK found for id:" + sdkId);
+				return;
+			}
+
+			mgr.DisableSDK(sdkInfo, refreshImmediately);
+		}
+
+		#endregion
 
 		#region Private 
 		//SdkInfos cache
