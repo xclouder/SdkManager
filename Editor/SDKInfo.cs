@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
 namespace xClouder.SdkManager{
 	public class SDKInfo {
@@ -9,6 +10,15 @@ namespace xClouder.SdkManager{
 		public string Dir {get;set;}
 		public bool Enabled {get;set;}
 		public string Version {get;set;}
+
+		//maybe:ios/android/editor
+		public string Platform {get;set;}
+
+		/**
+		 * key: toPath, relative to /Assets
+		 * value: fromPath, relative to SDK folder
+		 */
+		public Dictionary<string, string> CopyRules {get;set;}
 
 		public bool IsDuplicateSDK(SDKInfo sdk)
 		{

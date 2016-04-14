@@ -28,13 +28,18 @@ namespace xClouder.SdkManager{
 		//store the origin sdk assets
 		private static string DIR_SDK_ASSET_STORE = ".SdkStore";
 
+		private static string DIR_USER_CODE = ".USER_CODE";
+
 		//store the soft link of sdk assets
 		private static string DIR_MANAGED_SDKS = "ManagedSDKs";
 
 		private string managedSDKsDir;
 		private string sdkStoreDir;
 
-		public string GetSdkStoreDir()
+		//temp for use
+		private BaseSdkImporter sdkImporter = new BaseSdkImporter();
+
+		public string GetSdkStoreDir() 
 		{
 			return sdkStoreDir;
 		}
@@ -77,7 +82,7 @@ namespace xClouder.SdkManager{
 				}
 				catch (System.Exception e)
 				{
-					Debug.LogWarning("error:" + e.ToString());
+					Debug.LogError("error:" + e.ToString());
 					continue;
 				}
 			}
@@ -101,6 +106,12 @@ namespace xClouder.SdkManager{
 			}
 
 			hasLoadedSdkInfos = true;
+		}
+
+		public void CleanSDKInfos()
+		{
+			sdkInfos.Clear();
+			sdkInfoDict.Clear();
 		}
 
 		public SDKInfo GetSDKInfo(string infoId)
@@ -172,6 +183,9 @@ namespace xClouder.SdkManager{
 				return;
 			}
 
+			sdkImporter.EnableSDK(sdk);
+
+			/*
 			string srcPath = Path.Combine(sdkStoreDir, sdk.Dir);
 			string link = Path.Combine(managedSDKsDir, sdk.Dir);
 
@@ -187,10 +201,11 @@ namespace xClouder.SdkManager{
 			else{
 				Debug.LogWarning("link fail:" + srcPath + " -> " + link);
 			}
+			*/
 
 			if (refreshAssetsImmediately)
 				AssetDatabase.Refresh();
-
+			
 			NotifyEnabledSDK(sdk);
 		}
 
@@ -223,6 +238,9 @@ namespace xClouder.SdkManager{
 				return;
 			}
 
+			sdkImporter.DisableSDK(sdk);
+
+			/*
 			string link = Path.Combine(managedSDKsDir, sdk.Dir);
 			if (File.Exists(link) || Directory.Exists(link)){
 				FileLinkUtil.RemoveSymbol(link);
@@ -231,6 +249,7 @@ namespace xClouder.SdkManager{
 			else{
 				Debug.Log("no link file:" + link);
 			}
+			*/
 
 			if (refreshAssetsImmediately)
 				AssetDatabase.Refresh();
@@ -364,28 +383,59 @@ namespace xClouder.SdkManager{
 
 		private bool IsSdkExists(SDKInfo sdk)
 		{
+			if (sdkInfoDict == null)
+			{
+				return false;
+			}
+
 			return sdkInfoDict.ContainsKey(sdk.Id);
 		}
 		#endregion
 
 
 		#region Util
+		private static string SDK_INFO_FILE_NAME = "info.json";
 		private static SDKInfo ParseSdkInfoFromDirectory(string dir)
 		{
 			if (!IsValidSdkDir(dir))
 			{
 				throw new System.InvalidOperationException("dir is not a valid sdkdir");
 			}
-			var info = new SDKInfo();
+
+			SDKInfo info = null;
+
+			var infoFilePath = Path.Combine(dir, SDK_INFO_FILE_NAME);
+			if (!File.Exists(infoFilePath))
+			{
+				info = new SDKInfo();
+
+			}
+			else
+			{
+				var json = File.ReadAllText(infoFilePath);
+				Debug.Log("info json:" + json);
+
+				try 
+				{
+					info = JsonUtility.FromJson<SDKInfo>(json);
+				}catch (System.Exception e)
+				{
+					Debug.LogError("read info file error." + e.ToString());
+				}
+			}
+
 			DirectoryInfo di = new DirectoryInfo(dir);
-			info.Dir = di.Name;
+			string dirName = di.Name;
+
+			info.Dir = info.Dir ?? dirName;
 			info.Enabled = false;
 
 			//temp
-			info.Version = "1.0";
-			info.Id = info.Dir;
-			info.Name = info.Dir;
+			info.Version = info.Version ?? "1.0";
+			info.Id = info.Id ?? dirName;
+			info.Name = info.Name ?? dirName;
 
+			Debug.Log("info:" + info);
 			return info;
 
 		}

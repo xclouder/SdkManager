@@ -89,7 +89,7 @@ namespace xClouder.SdkManager{
 
 			GUILayout.BeginHorizontal();
 
-			GUILayout.FlexibleSpace();
+			GUILayout.FlexibleSpace(); 
 
 			if (GUILayout.Button("Help", new GUILayoutOption[] { GUILayout.Width(80)}))
 			{
@@ -99,6 +99,13 @@ namespace xClouder.SdkManager{
 			if (GUILayout.Button("SDKs Store...", new GUILayoutOption[] { GUILayout.Width(80)}))
 			{
 				OpenInFileBrowser.Open(SdkManager.Instance.GetSdkStoreDir());
+			}
+
+			if (GUILayout.Button("Refresh", new GUILayoutOption[] { GUILayout.Width(80)}))
+			{
+				SdkManager.Instance.LoadSdkInfos(true);
+
+				Reload();
 			}
 
 			if (GUILayout.Button("Install", new GUILayoutOption[] { GUILayout.Width(80)}))
