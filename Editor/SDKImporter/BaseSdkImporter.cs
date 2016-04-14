@@ -14,10 +14,6 @@ using System.IO;
 namespace xClouder.SdkManager{
 	public class BaseSdkImporter
 	{
-			
-		#region Private Method
-
-		#endregion
 
 		#region Public Method
 
@@ -53,7 +49,14 @@ namespace xClouder.SdkManager{
 				var toPath = pair.Key;
 				var path = GetToPath(toPath);
 
-				FileUtil.DeleteFileOrDirectory(path);
+				if (Directory.Exists(path) || File.Exists(path))
+				{
+					FileUtil.DeleteFileOrDirectory(path);
+				}
+				else
+				{
+					Debug.LogWarning("Path:" + path + " NOT EXIST");
+				}
 			}
 
 		}
@@ -83,13 +86,17 @@ namespace xClouder.SdkManager{
 			Debug.Log("fromPath:" + from);
 			Debug.Log("toPath:" + to);
 
-			var fileInfo = new FileInfo(to);
-			var parentDir = fileInfo.Directory.FullName;
-			if (!Directory.Exists(parentDir))
-			{
-				Debug.Log("directory:" + parentDir + " not exist, create it.");
-				Directory.CreateDirectory(parentDir);
+			var attr = File.GetAttributes(from);
+			if ((attr & FileAttributes.Directory) == 0){
+				var fileInfo = new FileInfo(to);
+				var parentDir = fileInfo.Directory.FullName;
+				if (!Directory.Exists(parentDir))
+				{
+					Debug.Log("directory:" + parentDir + " not exist, create it.");
+					Directory.CreateDirectory(parentDir);
+				}
 			}
+
 			FileUtil.CopyFileOrDirectory(from, to);
 
 		}

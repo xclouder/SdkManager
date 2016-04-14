@@ -30,8 +30,13 @@ namespace xClouder.SdkManager{
 
 		private static string DIR_USER_CODE = ".USER_CODE";
 
+		private static string DIR_MGR_DATA = ".DATA";
+		private static string FILE_ENABLED_SDKS = "enabledSDKs.txt";
+
 		//store the soft link of sdk assets
 		private static string DIR_MANAGED_SDKS = "ManagedSDKs";
+
+		private static string[] EXCEPT_DIRS = new string[]{ DIR_MGR_DATA, DIR_USER_CODE };
 
 		private string managedSDKsDir;
 		private string sdkStoreDir;
@@ -55,6 +60,21 @@ namespace xClouder.SdkManager{
 
 		}
 
+		private bool IsInExceptDir(string dir)
+		{
+			var dirInfo = new DirectoryInfo(dir);
+			foreach (var d in EXCEPT_DIRS)
+			{
+				if (d.Equals(dirInfo.Name))
+				{
+					return true;
+				}
+			}
+
+			return false;
+				
+		}
+
 		private bool hasLoadedSdkInfos = false;
 		public void LoadSdkInfos(bool force)
 		{
@@ -76,6 +96,9 @@ namespace xClouder.SdkManager{
 			string[] directories = Directory.GetDirectories(sdkStoreDir);
 			foreach (var dir in directories)
 			{
+				if (IsInExceptDir(dir))
+					continue;
+
 				try {
 					var sdk = ParseSdkInfoFromDirectory(dir);
 					AddSdk(sdk);
@@ -206,10 +229,48 @@ namespace xClouder.SdkManager{
 			}
 			*/
 
+			sdk.Enabled = true;
+
 			if (refreshAssetsImmediately)
-				AssetDatabase.Refresh();
-			
+				RefreshAssets();
+
 			NotifyEnabledSDK(sdk);
+		}
+
+		private void RefreshAssets()
+		{
+			AssetDatabase.Refresh();
+
+			SaveData();
+		}
+		private void SaveData()
+		{
+			
+			//save enabled sdks to .txt file
+			if (sdkInfos == null)
+				return;
+			
+			List<string> ls = new List<string>();
+			foreach (SDKInfo i in sdkInfos)
+			{
+				if (i.Enabled)
+					ls.Add(i.Id);
+			}
+
+			if (ls.Count == 0)
+				return;
+			
+			var data = string.Join("|", ls.ToArray());
+			Debug.Log("save data:" + data);
+
+			var path = Path.Combine(GetSdkStoreDir(), DIR_MGR_DATA);
+			if (!Directory.Exists(path))
+			{
+				Directory.CreateDirectory(path);
+			}
+
+			path = Path.Combine(path, FILE_ENABLED_SDKS);
+			File.WriteAllText(path, data);
 		}
 
 		private void NotifyEnabledSDK(SDKInfo sdk)
@@ -254,8 +315,10 @@ namespace xClouder.SdkManager{
 			}
 			*/
 
+			sdk.Enabled = false;
+
 			if (refreshAssetsImmediately)
-				AssetDatabase.Refresh();
+				RefreshAssets();
 
 			NotifyDisabledSDK(sdk);
 		}
@@ -422,6 +485,16 @@ namespace xClouder.SdkManager{
 				{
 					//info = JsonUtility.FromJson<SDKInfo>(json);
 					info = LitJson.JsonMapper.ToObject<SDKInfo>(json);
+
+					if (info.CopyRules != null)
+					{
+						foreach (var pair in info.CopyRules)
+						{
+							pair.Key.TrimEnd(new char[]{Path.DirectorySeparatorChar});
+
+						}
+					}
+
 				}catch (System.Exception e)
 				{
 					Debug.LogError("read info file error." + e.ToString());
