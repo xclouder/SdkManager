@@ -110,8 +110,11 @@ namespace xClouder.SdkManager{
 
 		public void CleanSDKInfos()
 		{
-			sdkInfos.Clear();
-			sdkInfoDict.Clear();
+			if (sdkInfos != null)
+				sdkInfos.Clear();
+
+			if (sdkInfoDict != null)
+				sdkInfoDict.Clear();
 		}
 
 		public SDKInfo GetSDKInfo(string infoId)
@@ -417,7 +420,8 @@ namespace xClouder.SdkManager{
 
 				try 
 				{
-					info = JsonUtility.FromJson<SDKInfo>(json);
+					//info = JsonUtility.FromJson<SDKInfo>(json);
+					info = LitJson.JsonMapper.ToObject<SDKInfo>(json);
 				}catch (System.Exception e)
 				{
 					Debug.LogError("read info file error." + e.ToString());

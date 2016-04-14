@@ -103,6 +103,7 @@ namespace xClouder.SdkManager{
 
 			if (GUILayout.Button("Refresh", new GUILayoutOption[] { GUILayout.Width(80)}))
 			{
+				SdkManager.Instance.CleanSDKInfos();
 				SdkManager.Instance.LoadSdkInfos(true);
 
 				Reload();

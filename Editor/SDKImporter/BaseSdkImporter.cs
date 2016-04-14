@@ -62,7 +62,7 @@ namespace xClouder.SdkManager{
 
 		protected string GetFromPath(SDKInfo sdk, string relativeFrom)
 		{
-			var fromPath = Path.Combine(Application.dataPath, sdk.Dir);
+			var fromPath = Path.Combine(SdkManager.Instance.GetSdkStoreDir(), sdk.Dir);
 			fromPath = Path.Combine(fromPath, relativeFrom);
 			return fromPath;
 		}
@@ -81,8 +81,15 @@ namespace xClouder.SdkManager{
 			var from = GetFromPath(sdk, fromPath);
 			var to = GetToPath(toPath);
 			Debug.Log("fromPath:" + from);
-			Debug.Log("toPath" + to);
+			Debug.Log("toPath:" + to);
 
+			var fileInfo = new FileInfo(to);
+			var parentDir = fileInfo.Directory.FullName;
+			if (!Directory.Exists(parentDir))
+			{
+				Debug.Log("directory:" + parentDir + " not exist, create it.");
+				Directory.CreateDirectory(parentDir);
+			}
 			FileUtil.CopyFileOrDirectory(from, to);
 
 		}

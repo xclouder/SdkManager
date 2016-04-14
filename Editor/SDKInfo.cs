@@ -1,8 +1,11 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using LitJson;
 
 namespace xClouder.SdkManager{
+
+	[System.Serializable]
 	public class SDKInfo {
 
 		public string Id {get;set;}
@@ -39,6 +42,34 @@ namespace xClouder.SdkManager{
 			}
 
 			return base.Equals(o) && Id == sdk.Id;
+		}
+
+		public override string ToString()
+		{
+			System.Text.StringBuilder sb = new System.Text.StringBuilder();
+			sb.AppendLine(base.ToString());
+			sb.AppendLine("ID:" + this.Id);
+			sb.AppendLine("Name:" + this.Name);
+			sb.AppendLine("Dir:" + this.Dir);
+			sb.AppendLine("Version:" + this.Version);
+			sb.Append("CopyRules:");
+
+			if (CopyRules == null)
+			{
+				sb.AppendLine("null");
+			}
+			else
+			{
+				sb.AppendLine();
+				foreach (var pair in CopyRules)
+				{
+					var to = pair.Key;
+					var fr = pair.Value;
+					sb.AppendLine(fr + " to " + to);
+				}
+			}
+
+			return sb.ToString();
 		}
 	}
 }
